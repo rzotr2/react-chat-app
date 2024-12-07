@@ -6,6 +6,12 @@
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
+    "paths": {
+      "@components": ["./src/components/index.tsx"],
+      "@features": ["./src/features/index.tsx"],
+      "@hooks": ["./src/hooks/index.ts"],
+      "@models": ["./src/models/index.ts"],
+    },
 
     /* Bundler mode */
     "moduleResolution": "bundler",
