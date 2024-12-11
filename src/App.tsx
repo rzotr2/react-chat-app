@@ -1,6 +1,7 @@
-import {ReactElement} from "react";
-import {Button, HStack} from "@chakra-ui/react";
-import {ColorModeButton} from "./components/ui/color-mode.tsx";
+import { ReactElement } from "react";
+
+import { Button, HStack } from "@chakra-ui/react";
+import { ColorModeButton } from "./components/ui/color-mode.tsx";
 
 const App = (): ReactElement => {
     return (
