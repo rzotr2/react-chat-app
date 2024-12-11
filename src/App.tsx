@@ -13,7 +13,7 @@ const App = (): ReactElement => {
                 <RightSide />
             </Box>
         </Stack>
-    )
+    );
 };
 
 export default App;
