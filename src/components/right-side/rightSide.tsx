@@ -1,4 +1,7 @@
-import { Box, Flex, Group, Input, IconButton, Stack} from "@chakra-ui/react";
+import { useForm } from "react-hook-form";
+
+
+import { Box, Flex, Group, Input, IconButton, Stack } from "@chakra-ui/react";
 import { UserInfo } from "../reusable/userInfo.tsx";
 import { OpenedChat } from "./openedChat/openedChat.tsx";
 import { FaSearch } from "react-icons/fa";
@@ -6,8 +9,26 @@ import { HiDotsVertical } from "react-icons/hi";
 import { FaPaperclip } from "react-icons/fa";
 import { FaRegFaceSmile } from "react-icons/fa6";
 import { MdKeyboardVoice } from "react-icons/md";
+import { useMessagesStore } from "@hooks";
+import { Message } from "@models";
+import nextId from "react-id-generator";
+import {useCurrentMessageInput} from "../../hooks/current-message-input/currentMessageInput.ts";
 
 export const RightSide = () => {
+    const { handleSubmit, resetField, register, getValues } = useForm<Message>();
+    const addMessage = useMessagesStore(state => state.addMessage);
+    const onSubmit = handleSubmit(() => {
+        const newMessage = {
+            text: getValues('text'),
+            author: 'me',
+            timeStamp: Date().toLocaleString(),
+            id: nextId('msg-')
+        };
+
+        addMessage(newMessage);
+        resetField('text');
+    });
+
     return (
         <Stack direction="column" h="100%">
             <Box h="10%">
@@ -31,7 +52,7 @@ export const RightSide = () => {
                     </Flex>
                 </Flex>
             </Box>
-            <Box h="82%">
+            <Box h="82%" overflowY="scroll">
                 <OpenedChat></OpenedChat>
             </Box>
             <Box h="8%">
@@ -40,19 +61,24 @@ export const RightSide = () => {
                         <IconButton variant="ghost">
                             <FaPaperclip />
                         </IconButton>
-                        <Input placeholder="Write a message"
-                               border="none"
-                               size="lg"
-                               width="100%"
-                               _focus={{ boxShadow: 'none', border: 'none', outline: 'none' }}
-                        />
+                        <Box width="100%">
+                            <form onSubmit={onSubmit}>
+                                <Input {...register('text')}
+                                       value={useCurrentMessageInput.getState().text}
+                                       placeholder="Write a message"
+                                       border="none"
+                                       size="lg"
+                                       _focus={{boxShadow: 'none', border: 'none', outline: 'none'}}
+                                />
+                            </form>
+                        </Box>
                     </Group>
                     <Group>
                         <IconButton variant="ghost">
-                            <FaRegFaceSmile />
+                            <FaRegFaceSmile/>
                         </IconButton>
                         <IconButton variant="ghost">
-                            <MdKeyboardVoice />
+                            <MdKeyboardVoice/>
                         </IconButton>
                     </Group>
                 </Flex>

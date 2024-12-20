@@ -1,7 +1,7 @@
-import {ReactElement} from "react";
+import { ReactElement } from "react";
 
-import {Box, Grid, Text, GridItem} from "@chakra-ui/react";
-import {UserInfo} from "../../../reusable/userInfo.tsx";
+import { Box, Grid, Text, GridItem } from "@chakra-ui/react";
+import { UserInfo } from "../../../reusable/userInfo.tsx";
 
 export const ChatListItem = (): ReactElement => {
     return (
