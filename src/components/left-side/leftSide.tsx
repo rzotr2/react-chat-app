@@ -7,11 +7,11 @@ import { MyDrawer } from "./drawer/myDrawer.tsx";
 export const LeftSide = (): ReactElement => {
     return (
         <Stack direction="column" h="100%">
-            <Flex align="center" gap="4" p="2" h="7%">
+            <Flex align="center" padding="2">
                 <MyDrawer></MyDrawer>
                 <Input rounded="full" placeholder="Search chats"></Input>
             </Flex>
-            <Box overflowY="auto" h="93%">
+            <Box overflowY="auto">
                 <ChatList />
             </Box>
         </Stack>

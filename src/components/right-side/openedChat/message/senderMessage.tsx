@@ -2,11 +2,16 @@ import { Box, Flex, Text } from "@chakra-ui/react";
 import { Message } from "@models";
 import { Avatar } from "../../../ui/avatar.tsx";
 import { MenuContent, MenuContextTrigger, MenuItem, MenuRoot } from "../../../ui/menu.tsx";
+import { useMessagesStore } from "@hooks";
 
-export const SenderMessage = ({text}: Message) => {
-    // const handleClick = (event) => {
-    //     currentMessageInput
-    // };
+export const SenderMessage = (message: Message) => {
+    const messagesStore = useMessagesStore((state) => state);
+    const setCurrentMessage = useMessagesStore((state) => state.setCurrentMessage);
+
+    const handleClick = (id: string) => {
+        const index = messagesStore.messages.findIndex((message) => message.id === id);
+        setCurrentMessage(messagesStore.messages[index]);
+    };
 
     return (
         <MenuRoot>
@@ -19,12 +24,13 @@ export const SenderMessage = ({text}: Message) => {
                          rounded="4xl"
                          roundedBottomLeft="md">
                         <Text paddingY="2"
-                              paddingX="5">{text}</Text>
+                              paddingX="5">`{message.text}
+                        </Text>
                     </Box>
                 </Flex>
             </MenuContextTrigger>
             <MenuContent>
-                <MenuItem value="msg-edit">Edit</MenuItem>
+                <MenuItem value="msg-edit" onClick={() => handleClick(message.id)}>Edit</MenuItem>
                 <MenuItem value="msg-delete">Delete</MenuItem>
             </MenuContent>
         </MenuRoot>

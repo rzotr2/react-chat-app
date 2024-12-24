@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form";
-
+import { useEffect } from "react";
 
 import { Box, Flex, Group, Input, IconButton, Stack } from "@chakra-ui/react";
 import { UserInfo } from "../reusable/userInfo.tsx";
@@ -11,31 +11,48 @@ import { FaRegFaceSmile } from "react-icons/fa6";
 import { MdKeyboardVoice } from "react-icons/md";
 import { useMessagesStore } from "@hooks";
 import { Message } from "@models";
-import nextId from "react-id-generator";
-import {useCurrentMessageInput} from "../../hooks/current-message-input/currentMessageInput.ts";
+import { v4 as uuidv4 } from 'uuid';
 
 export const RightSide = () => {
-    const { handleSubmit, resetField, register, getValues } = useForm<Message>();
+    const { handleSubmit, resetField, register, getValues, setValue, setFocus } = useForm<Message>();
     const addMessage = useMessagesStore(state => state.addMessage);
+    const updateMessage = useMessagesStore(state => state.updateMessage);
+    const messagesStore = useMessagesStore(state => state.messages);
+    const currentMessage = useMessagesStore(state => state.currentMessage);
     const onSubmit = handleSubmit(() => {
         const newMessage = {
             text: getValues('text'),
             author: 'me',
             timeStamp: Date().toLocaleString(),
-            id: nextId('msg-')
+            id: uuidv4()
         };
 
-        addMessage(newMessage);
+        const index = messagesStore.findIndex((message) => {
+            return message.id === currentMessage.id;
+        });
+
+        if (index >= 0) {
+            updateMessage(newMessage, index);
+        } else if (index === -1) {
+            addMessage(newMessage);
+            console.log(index);
+        }
+
         resetField('text');
     });
 
+    useEffect(() => {
+        setValue("text", currentMessage.text);
+        setFocus("text");
+    }, [currentMessage, setValue, setFocus]);
+
     return (
         <Stack direction="column" h="100%">
-            <Box h="10%">
+            <Box>
                 <Flex align="center"
                       justifyContent="space-between"
-                      flex="1"
-                      p="1"
+                      paddingY="1"
+                      paddingX="3"
                       border="solid"
                       borderWidth="0.5px"
                       borderColor="gray">
@@ -52,10 +69,10 @@ export const RightSide = () => {
                     </Flex>
                 </Flex>
             </Box>
-            <Box h="82%" overflowY="scroll">
+            <Box overflowY="scroll" height="92%">
                 <OpenedChat></OpenedChat>
             </Box>
-            <Box h="8%">
+            <Box h="auto" paddingX={3}>
                 <Flex alignItems="center" flex="1">
                     <Group paddingY="1" flexGrow="1" fontSize="1.5rem">
                         <IconButton variant="ghost">
@@ -64,7 +81,7 @@ export const RightSide = () => {
                         <Box width="100%">
                             <form onSubmit={onSubmit}>
                                 <Input {...register('text')}
-                                       value={useCurrentMessageInput.getState().text}
+                                       id="inputTextField"
                                        placeholder="Write a message"
                                        border="none"
                                        size="lg"

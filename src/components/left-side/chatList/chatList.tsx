@@ -26,6 +26,10 @@ export const ChatList = (): ReactElement => {
             <ChatListItem></ChatListItem>
             <ChatListItem></ChatListItem>
             <ChatListItem></ChatListItem>
+            <ChatListItem></ChatListItem>
+            <ChatListItem></ChatListItem>
+            <ChatListItem></ChatListItem>
+            <ChatListItem></ChatListItem>
         </Box>
     );
 };

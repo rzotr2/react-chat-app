@@ -1,11 +1,13 @@
 export type User = {
-    name: string,
+    username: string,
     id: string,
     status?: string,
     phoneNumber: number,
     email: string,
     password: string,
-    country: string
+    country?: string,
+    isLoggedIn: boolean,
+    gender: 'male' | 'female' | 'other',
 }
 
 export type Message = {

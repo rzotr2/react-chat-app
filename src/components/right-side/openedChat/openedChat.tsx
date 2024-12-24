@@ -7,7 +7,7 @@ export const OpenedChat = () => {
     const messages = useMessagesStore((state) => state.messages);
 
     return (
-        <Flex direction="column" justifyContent="flex-end" h="100%" paddingX="4">
+        <Flex direction="column" justifyContent="flex-end" minHeight="100%" paddingX="4">
             {messages.map((message, index) => {
                 if (message.author === 'me') {
                     return (
