@@ -1,18 +1,19 @@
 import { ReactElement } from "react";
+import { Routes, Route } from 'react-router-dom';
 
-import { Box, Stack } from "@chakra-ui/react";
-import { LeftSide, RightSide } from "@components";
+import MainPage from "./pages/MainPage.tsx";
+import {SignUpPage} from "./pages/SignUpPage.tsx";
+import {LoginPage} from "./pages/LoginPage.tsx";
 
 const App = (): ReactElement => {
     return (
-        <Stack direction={{ md: "row" }} gap="0">
-            <Box w="30%" h='calc(100vh)'>
-                <LeftSide />
-            </Box>
-            <Box w="70%" h='calc(100vh)'>
-                <RightSide />
-            </Box>
-        </Stack>
+        <>
+            <Routes>
+                <Route path="/" element={<SignUpPage />} />
+                <Route path="/login" element={<LoginPage />} />
+                <Route path="/chat" element={<MainPage />} />
+            </Routes>
+        </>
     );
 };
 

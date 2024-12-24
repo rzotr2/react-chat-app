@@ -1,19 +1,21 @@
 export type User = {
-    userName: string,
-    userId: string,
-    userStatus?: string,
-    userPhoneNumber: number,
-    userEmail: string,
-    userPassword: string,
-    userCountry: string
+    username: string,
+    id: string,
+    status?: string,
+    phoneNumber: number,
+    email: string,
+    password: string,
+    country?: string,
+    isLoggedIn: boolean,
+    gender: 'male' | 'female' | 'other',
 }
 
 export type Message = {
-    messageText: string,
-    messageAuthor: string,
-    messageRecipient: string,
-    messageTimeStamp: string,
-    messageId: string,
-    messageDelivered: boolean,
-    messageReceived: boolean
+    text: string,
+    author?: string,
+    recipient?: string,
+    timeStamp?: string,
+    id: string,
+    delivered?: boolean,
+    received?: boolean
 }
