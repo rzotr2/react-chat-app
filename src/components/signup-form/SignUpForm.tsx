@@ -3,16 +3,14 @@ import { Field } from "../ui/field.tsx";
 import { NativeSelectField, NativeSelectRoot } from "../ui/native-select.tsx";
 import { useForm } from "react-hook-form";
 import { User } from "@models";
-import { v4 as uuidv4 } from 'uuid';
-import { useUsersStore } from "../../hooks/store/usersStore.ts";
 import { Alert } from "../ui/alert.tsx";
-import {useState} from "react";
-import {useNavigate} from "react-router-dom";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { socket } from '../../socket.ts';
 
 export const SignUpForm = () => {
     const { register, watch, handleSubmit, getValues } = useForm();
-    const users: User[] = useUsersStore(state => state.users);
-    const addUser = useUsersStore(state => state.addUser);
+
     const [userExists, setUserExists] = useState<string[] | null>(null);
     const navigate = useNavigate();
 
@@ -30,50 +28,39 @@ export const SignUpForm = () => {
     const invalidRepeatPassword: boolean = watchRepeatPasswordField ? watchRepeatPasswordField !== watchPasswordField : false;
     const invalidPhoneNumber: boolean = watchPhoneNumberField ? !phoneNumberRegExp.test(watchPhoneNumberField) : false;
 
-    const onSubmit = () => {
-        const newUser: User = {
+    const addUser = () => {
+        const user: User = {
             username: getValues('username'),
-            id: uuidv4(),
             phoneNumber: getValues('phoneNumber'),
             email: getValues('email'),
             password: getValues('password'),
             country: getValues('country'),
-            isLoggedIn: true,
+            isLoggedIn: false,
+            isAdmin: false,
             gender: getValues('gender')
         };
 
-        const checkIfUserAlreadyExists = (newUser: User) => {
-            const conflictFields: string[] = [];
-
-            users.forEach((user) => {
-                if (user.username === newUser.username) {
-                    conflictFields.push('username');
-                }
-                if (user.email === newUser.email) {
-                    conflictFields.push('email');
-                }
-                if (user.phoneNumber === newUser.phoneNumber) {
-                    conflictFields.push('phone number');
-                }
-            });
-
-            if (conflictFields.length > 0) {
-                return [`A user with the same ${conflictFields.join(', ')} already exists`, 'error'];
-            } else {
-                addUser(newUser);
+        socket.emit("register", user);
+        console.log('user sent to server');
+        socket.on("userRegistered", (result: boolean) => {
+            if (result) {
+                setUserExists(['You were successfully registered. Please login in the next page. Redirecting...', 'success']);
                 setTimeout(() => {
-                    navigate('/chat');
-                }, 3000);
-                return ['You were successfully registered, redirecting in 3s', 'success'];
+                    navigate('/login');
+                }, 2500);
+            } else {
+                setUserExists(['User with the same username, email or phone number already exists. Try again', "error"]);
             }
-        };
-
-        setUserExists(checkIfUserAlreadyExists(newUser));
+        });
     };
+
+    socket.on("connect", () => {
+        console.log(`[client] Connected with ID: ${socket.id}`);
+    });
 
     return (
         <Box>
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(addUser)}>
                 <Fieldset.Root size="lg" w="xl">
                     <Stack>
                         <Fieldset.Legend>Sign up</Fieldset.Legend>
@@ -233,14 +220,14 @@ export const SignUpForm = () => {
                                 variant="underline"
                                 colorPalette="teal"
                             >
-                                register
+                                login
                             </Link>{" "}
                             page
                         </Text>
                     </Flex>
                 </Fieldset.Root>
             </form>
-            {userExists && <Alert status={userExists[1] as "error" | "success"} title={userExists[0]} />}
+            {userExists && <Alert title={userExists[0]} status={userExists[1] as "error" | "success"} />}
         </Box>
     );
 };

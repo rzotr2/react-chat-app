@@ -1,14 +1,29 @@
 import { Flex, Box } from "@chakra-ui/react";
 import { SenderMessage } from "./message/senderMessage.tsx";
 import { ReceiverMessage } from "./message/receiverMessage.tsx";
-import { useMessagesStore } from "@hooks";
+import { Message } from "@models";
+import { useEffect, useState } from "react";
+import {socket} from "../../../socket.ts";
 
 export const OpenedChat = () => {
-    const messages = useMessagesStore((state) => state.messages);
+    const [messages, setMessages] = useState<Message[] | null>(null);
+
+    useEffect(() => {
+        socket.emit("getAllMessages");
+    }, []);
+
+    socket.on("allMessagesSent", (data: Message[]) => {
+        console.log(localStorage.getItem('token'));
+        setMessages(data);
+    });
+
+    // socket.emit("sendMessage", (message: Message) => {
+    //
+    // });
 
     return (
         <Flex direction="column" justifyContent="flex-end" minHeight="100%" paddingX="4">
-            {messages.map((message, index) => {
+            {messages?.map((message, index) => {
                 if (message.author === 'me') {
                     return (
                         <Box key={index}
@@ -18,9 +33,8 @@ export const OpenedChat = () => {
                         >
                             <ReceiverMessage text={message.text}
                                              author={message.author}
-                                             recipient={message.recipient}
-                                             timeStamp={message.timeStamp}
-                                             id={message.id}
+                                             to={message.to}
+                                             timestamp={message.timestamp}
                                              delivered={message.delivered}
                                              received={message.received}>
                             </ReceiverMessage>
@@ -33,9 +47,8 @@ export const OpenedChat = () => {
                              maxWidth="45%">
                             <SenderMessage text={message.text}
                                            author={message.author}
-                                           recipient={message.recipient}
-                                           timeStamp={message.timeStamp}
-                                           id={message.id}
+                                           to={message.to}
+                                           timestamp={message.timestamp}
                                            delivered={message.delivered}
                                            received={message.received}>
                             </SenderMessage>

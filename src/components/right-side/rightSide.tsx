@@ -11,40 +11,46 @@ import { FaRegFaceSmile } from "react-icons/fa6";
 import { MdKeyboardVoice } from "react-icons/md";
 import { useMessagesStore } from "@hooks";
 import { Message } from "@models";
-import { v4 as uuidv4 } from 'uuid';
+import {socket} from "../../socket.ts";
 
 export const RightSide = () => {
-    const { handleSubmit, resetField, register, getValues, setValue, setFocus } = useForm<Message>();
-    const addMessage = useMessagesStore(state => state.addMessage);
-    const updateMessage = useMessagesStore(state => state.updateMessage);
-    const messagesStore = useMessagesStore(state => state.messages);
-    const currentMessage = useMessagesStore(state => state.currentMessage);
+    const { handleSubmit, resetField, register, getValues } = useForm<Message>();
+    // const addMessage = useMessagesStore(state => state.addMessage);
+    // const updateMessage = useMessagesStore(state => state.updateMessage);
+    // const messagesStore = useMessagesStore(state => state.messages);
+    // const currentMessage = useMessagesStore(state => state.currentMessage);
+
     const onSubmit = handleSubmit(() => {
         const newMessage = {
             text: getValues('text'),
-            author: 'me',
-            timeStamp: Date().toLocaleString(),
-            id: uuidv4()
+            author: 'd',
+            to: "you",
+            timestamp: new Date(),
+            delivered: false,
+            received: false
         };
 
-        const index = messagesStore.findIndex((message) => {
-            return message.id === currentMessage.id;
-        });
+        socket.emit("sendMessage", newMessage);
 
-        if (index >= 0) {
-            updateMessage(newMessage, index);
-        } else if (index === -1) {
-            addMessage(newMessage);
-            console.log(index);
-        }
+        //
+        // const index = messagesStore.findIndex((message) => {
+        //     return message.id === currentMessage.id;
+        // });
+        //
+        // if (index >= 0) {
+        //     updateMessage(newMessage, index);
+        // } else if (index === -1) {
+        //     addMessage(newMessage);
+        //     console.log(index);
+        // }
 
         resetField('text');
     });
 
-    useEffect(() => {
-        setValue("text", currentMessage.text);
-        setFocus("text");
-    }, [currentMessage, setValue, setFocus]);
+    // useEffect(() => {
+    //     setValue("text", currentMessage.text);
+    //     setFocus("text");
+    // }, [currentMessage, setValue, setFocus]);
 
     return (
         <Stack direction="column" h="100%">

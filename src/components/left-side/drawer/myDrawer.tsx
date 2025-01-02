@@ -7,15 +7,15 @@ import {
     DrawerTitle,
     DrawerTrigger
 } from "../../ui/drawer.tsx";
-import {Box, Button, Icon, Text} from "@chakra-ui/react";
-import {VscThreeBars} from "react-icons/vsc";
+import { Box, Button, Icon, Text } from "@chakra-ui/react";
+import { VscThreeBars } from "react-icons/vsc";
 import { FaUserGroup } from "react-icons/fa6";
 import { IoMdContact } from "react-icons/io";
 import { IoCallOutline } from "react-icons/io5";
 import { GrFavorite } from "react-icons/gr";
 import { IoSettingsOutline } from "react-icons/io5";
-import {ColorModeButton} from "../../ui/color-mode.tsx";
-import {UserInfo} from "../../reusable/userInfo.tsx";
+import { ColorModeButton } from "../../ui/color-mode.tsx";
+import { UserInfo } from "../../reusable/userInfo.tsx";
 
 export const MyDrawer = () => {
     return (
@@ -24,7 +24,7 @@ export const MyDrawer = () => {
             <DrawerTrigger asChild>
                 <Button variant="outline">
                     <Icon fontSize="x-large">
-                        <VscThreeBars />
+                        <VscThreeBars></VscThreeBars>
                     </Icon>
                 </Button>
             </DrawerTrigger>

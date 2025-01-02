@@ -1,42 +1,64 @@
-import { Box, Button, Fieldset, Input, Stack } from "@chakra-ui/react";
+import {Box, Button, Fieldset, Flex, Input, Link, Stack, Text} from "@chakra-ui/react";
 import { Field } from "../ui/field.tsx";
 import { useForm } from "react-hook-form";
-import { User } from "@models";
-import { useUsersStore } from "../../hooks/store/usersStore.ts";
 import { Alert } from "../ui/alert.tsx";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { socket } from "../../socket.ts";
 
 export const LoginForm = () => {
     const { register, handleSubmit, getValues, resetField } = useForm();
-    const users: User[] = useUsersStore(state => state.users);
     const [userExists, setUserExists] = useState<string[] | null>(null);
     const navigate = useNavigate();
 
-    const onSubmit = () => {
-        const usernameOrEmail = getValues('email/username');
-        const password = getValues('password');
+    const userLogin = () => {
+        const userData = {
+            username: getValues('email/username'),
+            email: getValues('email/username'),
+            password: getValues('password')
+        };
 
-        const user = users.find((user) => {
-            return (user.username === usernameOrEmail || user.email === usernameOrEmail) && user.password === password;
+        socket.on("connection", () => {
+            console.log('[client] Connected]');
         });
 
-        if (user) {
-            setUserExists(["You are successfully logged in, redirecting in 3s", "success"]);
+        socket.emit("login", userData);
+        socket.on("userLoginResult", (response) => {
+            if (response.userFound && response.passwordMatch) {
+                setUserExists(["You are successfully logged in. Redirecting...", "success"]);
+                localStorage.setItem("token", response.token);
+                setTimeout(() => {
+                    navigate("/chat");
+                }, 1500);
+            } else {
+                setUserExists(["Your login or password incorrect", "error"]);
+                resetField('email/username');
+                resetField('password');
+            }
+        });
 
-            setTimeout(() => {
-                navigate("/chat");
-            }, 3000);
-        } else {
-            setUserExists(["Your login or password incorrect", "error"]);
-            resetField("email/username");
-            resetField("password");
-        }
+
+
+        // const user = users.find((user) => {
+        //     return (user.username === usernameOrEmail || user.email === usernameOrEmail) && user.password === password;
+        // });
+        //
+        // if (user) {
+        //     setUserExists(["You are successfully logged in, redirecting in 3s", "success"]);
+        //
+        //     setTimeout(() => {
+        //         navigate("/chat");
+        //     }, 3000);
+        // } else {
+        //     setUserExists(["Your login or password incorrect", "error"]);
+        //     resetField("email/username");
+        //     resetField("password");
+        // }
     };
 
     return (
         <Box>
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={handleSubmit(userLogin)}>
                 <Fieldset.Root size="lg" w="xl">
                     <Stack>
                         <Fieldset.Legend>Sign up</Fieldset.Legend>
@@ -59,9 +81,22 @@ export const LoginForm = () => {
                                    type="password"/>
                         </Field>
                     </Fieldset.Content>
-                    <Button type="submit" alignSelf="flex-start">
-                        Log in
-                    </Button>
+                    <Flex alignItems="center" gap="5">
+                        <Button type="submit" alignSelf="flex-start">
+                            Login
+                        </Button>
+                        <Text>
+                            Don`t have an account? Go to the{" "}
+                            <Link
+                                onClick={() => navigate('/')}
+                                variant="underline"
+                                colorPalette="teal"
+                            >
+                                register
+                            </Link>{" "}
+                            page
+                        </Text>
+                    </Flex>
                 </Fieldset.Root>
             </form>
             {userExists && <Alert status={userExists[1] as "error" | "success"} title={userExists[0]} />}
