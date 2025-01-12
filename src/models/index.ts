@@ -4,7 +4,6 @@ export type User = {
     password: string,
     phoneNumber: number,
     country: string,
-    isLoggedIn: boolean,
     isAdmin: boolean,
     gender: string,
 }
@@ -17,3 +16,19 @@ export type Message = {
     delivered: boolean,
     received: boolean
 }
+
+export type LoginPayload = Pick<User, 'email' | 'password'>;
+
+export type SuccessResponse<R> = {
+    success: true;
+    response: R;
+};
+
+export type ErrorResponse = {
+    success: false;
+    error: string;
+};
+
+export type ServerResponse<R> = SuccessResponse<R> | ErrorResponse;
+
+

@@ -7,7 +7,7 @@ import {
     DrawerTitle,
     DrawerTrigger
 } from "../../ui/drawer.tsx";
-import { Box, Button, Icon, Text } from "@chakra-ui/react";
+import { Box, Button, Link, Text } from "@chakra-ui/react";
 import { VscThreeBars } from "react-icons/vsc";
 import { FaUserGroup } from "react-icons/fa6";
 import { IoMdContact } from "react-icons/io";
@@ -23,9 +23,9 @@ export const MyDrawer = () => {
             <DrawerBackdrop />
             <DrawerTrigger asChild>
                 <Button variant="outline">
-                    <Icon fontSize="x-large">
+                    <Link fontSize="x-large">
                         <VscThreeBars></VscThreeBars>
-                    </Icon>
+                    </Link>
                 </Button>
             </DrawerTrigger>
             <DrawerContent>

@@ -1,59 +1,55 @@
-import {Box, Button, Fieldset, Flex, Input, Link, Stack, Text} from "@chakra-ui/react";
+import { Box, Button, Fieldset, Flex, Input, Link, Stack, Text } from "@chakra-ui/react";
 import { Field } from "../ui/field.tsx";
 import { useForm } from "react-hook-form";
 import { Alert } from "../ui/alert.tsx";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { socket } from "../../socket.ts";
+import { loginUser } from "../../services/auth.ts";
 
 export const LoginForm = () => {
     const { register, handleSubmit, getValues, resetField } = useForm();
-    const [userExists, setUserExists] = useState<string[] | null>(null);
+    const [loginMessage, setLoginMessage] = useState<string[] | null>(null);
     const navigate = useNavigate();
 
-    const userLogin = () => {
+    // useEffect(() => {
+    //     // socket.on("userLoginResult", (response) => {
+    //     //     if (response.result.userFound && response.result.passwordMatch) {
+    //     //         setUserExists(["You are successfully logged in. Redirecting...", "success"]);
+    //     //         localStorage.setItem("token", response.token);
+    //     //         setCurrentUser(response.user);
+    //     //         setTimeout(() => {
+    //     //             navigate("/chat");
+    //     //         }, 1500);
+    //     //     } else {
+    //     //         setUserExists(["Your login or password incorrect", "error"]);
+    //     //         resetField('password');
+    //     //     }
+    //     // });
+    //
+    //     return () => {
+    //         socket.off("userLoginResult");
+    //     };
+    // }, [setCurrentUser, navigate]);
+
+    const userLogin = async () => {
         const userData = {
-            username: getValues('email/username'),
-            email: getValues('email/username'),
+            email: getValues('email'),
             password: getValues('password')
         };
 
-        socket.on("connection", () => {
-            console.log('[client] Connected]');
-        });
+        const result = await loginUser(userData);
 
-        socket.emit("login", userData);
-        socket.on("userLoginResult", (response) => {
-            if (response.userFound && response.passwordMatch) {
-                setUserExists(["You are successfully logged in. Redirecting...", "success"]);
-                localStorage.setItem("token", response.token);
-                setTimeout(() => {
-                    navigate("/chat");
+        if (result.success) {
+            setLoginMessage(["You are successfully logged in. Redirecting...", "success"]);
+            localStorage.setItem("token", result.response.token);
+            setTimeout(() => {
+                navigate("/chat");
                 }, 1500);
-            } else {
-                setUserExists(["Your login or password incorrect", "error"]);
-                resetField('email/username');
-                resetField('password');
-            }
-        });
 
-
-
-        // const user = users.find((user) => {
-        //     return (user.username === usernameOrEmail || user.email === usernameOrEmail) && user.password === password;
-        // });
-        //
-        // if (user) {
-        //     setUserExists(["You are successfully logged in, redirecting in 3s", "success"]);
-        //
-        //     setTimeout(() => {
-        //         navigate("/chat");
-        //     }, 3000);
-        // } else {
-        //     setUserExists(["Your login or password incorrect", "error"]);
-        //     resetField("email/username");
-        //     resetField("password");
-        // }
+        } else {
+            setLoginMessage(["Your login or password incorrect", "error"]);
+            resetField('password');
+        }
     };
 
     return (
@@ -68,10 +64,10 @@ export const LoginForm = () => {
                     </Stack>
 
                     <Fieldset.Content>
-                        <Field label="Enter your email adress or username"
+                        <Field label="Enter your email address"
                                required
                         >
-                            <Input {...register("email/username")}/>
+                            <Input {...register("email")}/>
                         </Field>
                         <Field label="Password"
                                required
@@ -99,7 +95,7 @@ export const LoginForm = () => {
                     </Flex>
                 </Fieldset.Root>
             </form>
-            {userExists && <Alert status={userExists[1] as "error" | "success"} title={userExists[0]} />}
+            {loginMessage && <Alert status={loginMessage[1] as "error" | "success"} title={loginMessage[0]} />}
         </Box>
     );
 };

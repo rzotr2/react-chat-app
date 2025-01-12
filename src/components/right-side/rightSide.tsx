@@ -1,5 +1,4 @@
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
 
 import { Box, Flex, Group, Input, IconButton, Stack } from "@chakra-ui/react";
 import { UserInfo } from "../reusable/userInfo.tsx";
@@ -9,48 +8,44 @@ import { HiDotsVertical } from "react-icons/hi";
 import { FaPaperclip } from "react-icons/fa";
 import { FaRegFaceSmile } from "react-icons/fa6";
 import { MdKeyboardVoice } from "react-icons/md";
-import { useMessagesStore } from "@hooks";
 import { Message } from "@models";
-import {socket} from "../../socket.ts";
+import { socket } from "../../socket.ts";
+import { useMessagesStore, useUsersStore } from "@hooks";
+import { useEffect } from "react";
 
 export const RightSide = () => {
     const { handleSubmit, resetField, register, getValues } = useForm<Message>();
-    // const addMessage = useMessagesStore(state => state.addMessage);
-    // const updateMessage = useMessagesStore(state => state.updateMessage);
-    // const messagesStore = useMessagesStore(state => state.messages);
-    // const currentMessage = useMessagesStore(state => state.currentMessage);
+    const usersStore = useUsersStore(state => state);
+    const addMessage = useMessagesStore(state => state.addMessage);
+
+    useEffect(() => {
+        socket.on('messageSent', async (newMessage: Message) => {
+            if (newMessage) {
+                addMessage(newMessage);
+            }
+        });
+
+        return () => {
+            socket.off('messageSent');
+        };
+    }, [addMessage]);
 
     const onSubmit = handleSubmit(() => {
         const newMessage = {
             text: getValues('text'),
-            author: 'd',
+            author: usersStore.currentUser?.username || null,
             to: "you",
             timestamp: new Date(),
-            delivered: false,
+            delivered: true,
             received: false
         };
 
-        socket.emit("sendMessage", newMessage);
-
-        //
-        // const index = messagesStore.findIndex((message) => {
-        //     return message.id === currentMessage.id;
-        // });
-        //
-        // if (index >= 0) {
-        //     updateMessage(newMessage, index);
-        // } else if (index === -1) {
-        //     addMessage(newMessage);
-        //     console.log(index);
-        // }
+        if (newMessage.text) {
+            socket.emit("sendMessage", newMessage);
+        }
 
         resetField('text');
     });
-
-    // useEffect(() => {
-    //     setValue("text", currentMessage.text);
-    //     setFocus("text");
-    // }, [currentMessage, setValue, setFocus]);
 
     return (
         <Stack direction="column" h="100%">
